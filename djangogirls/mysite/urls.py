@@ -1,12 +1,8 @@
 from django.contrib import admin
-from django.urls import path
-from myapp import views
-from myapp import views
+from django.urls import path, include
 
 urlpatterns = [
-    # 使用 path 而不是 url
     path('admin/', admin.site.urls),
-    path('login/', views.login_view, name='login'),
-    path('home/', views.home_view, name='home'),  # 新增的 home 視圖 URL
-
+    path('', include('testttt.urls')),  # 如果這是主應用
+    # path('myapp/', include('myapp.urls')),  # 如果需要包括 myapp
 ]
