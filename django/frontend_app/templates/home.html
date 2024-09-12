@@ -35,28 +35,54 @@
             display: inline-block;
             margin: 5px;
         }
-        /* Hide sections initially */
+        #search-type {
+            width: 50px; 
+            display: inline-block;
+        }
+
+        /* Hide sections initially except tech-section */
         #tech-section, #tactic-section, #strategy-section, #report-data, #website-data {
             display: none;
         }
+
+        /* Adjust the width of the dropdown menu */
+        #search-type {
+            width: auto; 
+            min-width: 100px; 
+        }
     </style>
     <script>
+        // Function to show the selected section
         function showSection(sectionId) {
             // Hide all sections
             document.getElementById('tech-section').style.display = 'none';
             document.getElementById('tactic-section').style.display = 'none';
             document.getElementById('strategy-section').style.display = 'none';
+
             // Show the selected section
             document.getElementById(sectionId).style.display = 'block';
+
+            // Toggle search-type based on the section
+            if (sectionId === 'strategy-section') {
+                document.getElementById('search-type').style.display = 'block';
+            } else {
+                document.getElementById('search-type').style.display = 'none';
+            }
         }
 
+        // Function to toggle between different datasets
         function showTacticData(type) {
-            // Hide both datasets
             document.getElementById('report-data').style.display = 'none';
             document.getElementById('website-data').style.display = 'none';
+
             // Show the selected dataset
             document.getElementById(type).style.display = 'block';
         }
+
+        // Set the default section to display
+        document.addEventListener("DOMContentLoaded", function() {
+            showSection('tech-section'); // Default to showing tech-section on page load
+        });
     </script>
 </head>
 <body class="d-flex flex-column">
@@ -70,11 +96,10 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">首頁befor</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">首頁</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">資安總覽</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'search' %}">資安檢索</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">首頁</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">資安總覽</a></li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'subscribe' %}">訂閱內容</a></li>
+                        
                         <!-- Portfolio Dropdown -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Portfolio</a>
@@ -100,73 +125,57 @@
 
                         <div class="ms-xl-4">
                             <div class="text-center mb-4">
-                                <button class="btn btn-light me-2" type="button" onclick="showSection('tech-section')">技術</button>
-                                <button class="btn btn-light me-2" type="button" onclick="showSection('tactic-section')">戰術</button>
-                                <button class="btn btn-light" type="button" onclick="showSection('strategy-section')">戰略</button>
+                                <button class="btn btn-light me-2" type="button" onclick="showSection('tech-section')">戰略情資</button>
+                                <button class="btn btn-light me-2" type="button" onclick="showSection('tactic-section')">威脅指標(IOC)</button>
+                                <button class="btn btn-light" type="button" onclick="showSection('strategy-section')">公共漏洞和暴露(CVE)</button>
                             </div>
-                            <div class="input-group mb-2">
-                                <input class="form-control" type="text" placeholder="Search..." aria-label="Search..." aria-describedby="button-search" />
-                                <button class="btn btn-outline-light" id="button-search" type="button">Search</button>
-                            </div>
+                        
+                            <!-- 搜尋表單 -->
+                            <form method="GET" action="{% url 'home' %}">
+                                <div class="input-group mb-2">
+                                    <input class="form-control" type="text" name="query" placeholder="Search..." aria-label="Search..." value="{{ query }}">
+                                    <select class="form-select" id="search-type" name="search_type" aria-label="Search Type">
+                                        <option value="title" {% if search_type == 'title' %}selected{% endif %}>標題</option>
+                                        <option value="cve-id" {% if search_type == 'cve-id' %}selected{% endif %}>弱點編號</option>
+                                        <option value="product-name" {% if search_type == 'product-name' %}selected{% endif %}>產品名稱</option>
+                                    </select>
+                                    <button class="btn btn-outline-light" id="button-search" type="submit">搜尋</button>
+                                </div>
+                            </form>
                         </div>
+                        
                     </div>
                 </aside>
 
                 <!-- Sections -->
                 <div id="tech-section">
                     <!-- Tactic section with toggle buttons for different data -->
-                    <div class="d-flex justify-content-end mb-4">
-                        <button class="btn btn-outline-secondary me-2" type="button" onclick="showTacticData('report-data')">報告</button>
-                        <button class="btn btn-outline-secondary" type="button" onclick="showTacticData('website-data')">網站</button>
-                    </div>
-                    
-
-                    <!-- Report Data -->
-                    <div id="report-data">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>編號</th>
-                                    <th>報告標題</th>
-                                    <th>發佈時間</th>
-                                    <th>詳細資料</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Example Report 1</td>
-                                    <td>2024-08-28</td>
-                                    <td>Report Detail 1</td>
-                                </tr>
-                                <!-- Add more rows as needed -->
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Website Data -->
-                    <div id="website-data">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>編號</th>
-                                    <th>網站名稱</th>
-                                    <th>更新時間</th>
-                                    <th>詳細資料</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Example Website 1</td>
-                                    <td>2024-08-28</td>
-                                    <td>Website Detail 1</td>
-                                </tr>
-                                <!-- Add more rows as needed -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>編號</th>
+                                <th>標題</th>
+                                <th>發布日期</th>
+                                <th>詳細資料</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in news %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td> <!-- 自动生成编号 -->
+                                <td>{{ item.title }}</td> <!-- 显示新闻标题 -->
+                                <td>{{ item.publish_date }}</td> <!-- 显示发布日期 -->
+                                <td><a href="{{ item.url }}" target="_blank">查看詳情</a></td> <!-- 显示新闻链接 -->
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4">沒有可顯示的新聞。</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-
+                
 
                 <div id="tactic-section">
                     <!-- Second image section content -->
@@ -190,42 +199,39 @@
                                 <td>High</td>
                                 <td>Example Detail 1</td>
                             </tr>
-                            <!-- Add more rows as needed -->
                         </tbody>
                     </table>
                 </div>
 
-            <div id="strategy-section">
-                <!-- Third image section content -->
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>編號</th>
-                            <th>CVE ID</th>
-                            <th>發佈時間</th>
-                            <th>供應商</th>
-                            <th>CVSS</th>
-                            <th>詳情</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>1</td>
-                            <td><a href="{% url 'cve_search' cve_id='CVE-2024-0001' %}">Example CVE-2024-0001</a></td>
-                            <td>2024-08-28</td>
-                            <td>Example Vendor</td>
-                            <td>7.5</td>
-                            <td>Example Detail</td>
-                        </tr>
-                        <!-- Add more rows as needed -->
-                    </tbody>
-                </table>
-            </div>
-                
-
+                <div id="strategy-section">
+                    <!-- Third image section content -->
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>編號</th>
+                                <th>CVE ID</th>
+                                <th>發佈時間</th>
+                                <th>供應商</th>
+                                <th>CVSS</th>
+                                <th>詳情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>CVE-2024-0001</td>
+                                <td>2024-08-28</td>
+                                <td>Example Vendor</td>
+                                <td>7.5</td>
+                                <td>Example Detail</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
     </main>
+
     <!-- Footer-->
     <footer class="bg-dark py-4 mt-auto">
         <div class="container px-5">
@@ -241,6 +247,7 @@
             </div>
         </div>
     </footer>
+
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS-->
